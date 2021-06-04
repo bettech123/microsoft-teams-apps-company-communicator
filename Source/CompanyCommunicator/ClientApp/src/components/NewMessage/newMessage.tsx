@@ -486,7 +486,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
 
                                         <div>
-                                            <textarea
+                                            <TextArea
                                                 value={markdown}
                                                 onChange={this.onChangeMarkdown.bind(this)}
                                             />
