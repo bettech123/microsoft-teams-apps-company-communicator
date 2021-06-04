@@ -16,6 +16,15 @@ import { getInitAdaptiveCard, setCardTitle, setCardImageLink, setCardSummary, se
 import { getBaseUrl } from '../../configVariables';
 import { ImageUtil } from '../../utility/imageutility';
 import { TFunction } from "i18next";
+import ReactMarkdown from 'react-markdown';
+import  ReactMarkdownOptions  from 'react-markdown';
+import MarkdownIt from 'markdown-it'; 
+import MdEditor from 'react-markdown-editor-lite'
+import 'react-markdown-editor-lite/lib/index.css';
+import { initializeIcons } from 'office-ui-fabric-react/lib/Icons'; 
+
+
+
 
 //hours to be chosen when scheduling messages
 const hours = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
@@ -65,6 +74,8 @@ export interface formState {
     btnTitle?: string,
     author: string,
     card?: any,
+    markdown: string,
+  
     page: string,
     teamsOptionSelected: boolean,
     rostersOptionSelected: boolean,
@@ -100,6 +111,7 @@ export interface formState {
 
 export interface INewMessageProps extends RouteComponentProps, WithTranslation {
     getDraftMessagesList?: any;
+    source?: string;
 }
 
 class NewMessage extends React.Component<INewMessageProps, formState> {
@@ -137,6 +149,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             selectedGroupsNum: 0,
             selectedRadioBtn: "teams",
             selectedTeams: [],
+            markdown: "",
             selectedRosters: [],
             selectedGroups: [],
             errorImageUrlMessage: "",
@@ -428,11 +441,26 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         }
     }
 
+    private onChangeMarkdown(event:any) {
+        this.setState({
+            markdown: event.target.markdown
+        });
+    }
     public componentWillUnmount() {
         document.removeEventListener("keydown", this.escFunction, false);
     }
 
+   
     public render(): JSX.Element {
+        //I added this feature
+        // Initialize a markdown parser
+        const {markdown}= this.state
+        const mdParser = new MarkdownIt({
+            html: true,
+            linkify: true,
+            typographer: true,
+        });
+        // feature end here
         if (this.state.loader) {
             return (
                 <div className="Loader">
@@ -455,6 +483,18 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                             autoComplete="off"
                                             fluid
                                         />
+
+
+                                        <div>
+                                            <textarea
+                                                value={markdown}
+                                                onChange={this.onChangeMarkdown.bind(this)}
+                                            />
+
+                                            <ReactMarkdown children={this.state.markdown
+                                            } className="markdown__preview" />
+                                        </div>
+
                                         <Flex gap="gap.smaller" vAlign="end" className="inputField">
                                             <Input
                                                 value={this.state.imageLink}
@@ -488,6 +528,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                 onChange={this.onSummaryChanged}
                                                 fluid />
                                         </div>
+         
 
                                         <Input className="inputField"
                                             value={this.state.author}
